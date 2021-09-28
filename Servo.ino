@@ -56,6 +56,12 @@ void Servo_Move(ServoType* Serv, unsigned int desiredPWM);
   Purpose: Move servo to the desiredPWM position using incremental PWM values between the current angle and the desiredPWM
 */
 void Servo_Move_Segmented(ServoType *Serv, unsigned int desiredPWM, unsigned int seg);
+
+/*Max's Math Code. Comment this stuff later*/
+long constrain(long x, long in_min, long in_max) 
+long map(long x, long in_min, long in_max, long out_min, long out_max) 
+
+
 /*
 ----------------------------------
 -------------Main Code------------
@@ -97,6 +103,18 @@ void loop()
 ----------------------------------
 */
 
+long constrain(long x, long in_min, long in_max) 
+{
+  if (x < in_min) return in_min;
+  else if (x > out_min) return in_max;
+  return x;
+}
+
+long map(long x, long in_min, long in_max, long out_min, long out_max) 
+{
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
 void Servo_init(ServoType *Serv)
 {
   pinMode(Serv->zServoPin,OUTPUT);
@@ -104,9 +122,10 @@ void Servo_init(ServoType *Serv)
 
 void Servo_Move(ServoType* Serv, unsigned int desiredPWM)
 {
-  unsigned int newPWM;
+  //unsigned int newPWM;
   /* Limits PWM Values between the 'open' and 'closed' values*/
-  if(desiredPWM >= Serv->zServoPWMOpen)
+  Serv->zServoPWMCurrent = constrain(desiredPWM, Serv->zServoPWMClosed, Serv->zServoPWMOpen);
+  /*if(desiredPWM >= Serv->zServoPWMOpen)
   {
     newPWM = Serv->zServoPWMOpen;
   }
@@ -117,10 +136,10 @@ void Servo_Move(ServoType* Serv, unsigned int desiredPWM)
   else
   {
     newPWM = desiredPWM;
-  }
+  }*/
 
   /* Creates new current value and writes it to the pin */
-  Serv->zServoPWMCurrent = newPWM;
+  //Serv->zServoPWMCurrent = newPWM;
   analogWrite(Serv->zServoPin,newPWM);
 }
 
