@@ -2,6 +2,7 @@
   TODO:
   1. DETERMINE HOW SPEED OF HAND OPENING AND CLOSING SHOULD BE CONTROLLED
   2. DETERMINE "LEVELS" OF EACH API FUNCTION
+  3. testing my commit
 */
 /*
 ----------------------------------
