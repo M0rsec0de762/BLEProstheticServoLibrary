@@ -83,28 +83,24 @@ void setup()
 {
   /*Init Serial Line for Arduino debugging purposes*/
   Serial.begin(9600);
-  /*Init servo with only the pwm pin, and  */
+  /*Init servo with only the pwm pin, and open/closed pulse widths*/
   testServo.z_servo_pin = 3;
   testServo.z_servo_PWM_open = 2500;
   testServo.z_servo_PWM_closed = 500;
   servoInit(&testServo);
-  delay(3000);
   Serial.println("Init Complete");  // Debug Code
-  servoMove(&testServo, 2500);
-  delay(3000);
-  servoMove(&testServo, 500);
 }
 //https://docs.google.com/document/d/1P_BeJH5wWfhm9kize7KvitGLEQI_--hjxDYvU9wtM60/edit
 void loop() 
 {
-  servoMoveSegmented(&testServo, 500,7);
-  Serial.print("Move 1 to ");
-  Serial.println(testServo.z_servo_PWM_current);   // Debug Code
-  delay(1000);
-  servoMoveSegmented(&testServo, 2500,20);
-  Serial.print("Move 2 to ");
-  Serial.println(testServo.z_servo_PWM_current);   // Debug Code
-  delay(1000);
+  // servoMoveSegmented(&testServo, 2500,20);
+  // Serial.print("Move 1 to ");
+  // Serial.println(testServo.z_servo_PWM_current);   // Debug Code
+  // delay(1000);
+  // servoMoveSegmented(&testServo, 500,20);
+  // Serial.print("Move 2 to ");
+  // Serial.println(testServo.z_servo_PWM_current);   // Debug Code
+  // delay(1000);
 }
 
 
@@ -129,6 +125,7 @@ void loop()
 void servoInit(ServoType *Serv)
 {
   Serv->ZServ.attach(Serv->z_servo_pin);
+  servoMove(Serv,Serv->z_servo_PWM_open);
 }
 
 void servoMove(ServoType* Serv, unsigned int desiredPWM)
