@@ -19,7 +19,7 @@ typedef struct ServoType
   Input: ServoType Structure (A Servo)
   Purpose: Initializes the pins needed to drive the servo.
 */
-void Servo_init(ServoType *Serv);
+void servoInit(ServoType *Serv);
 /*
   Function Name: Servo_Move
   Input: 
@@ -29,7 +29,7 @@ void Servo_init(ServoType *Serv);
     Move servo to the desiredPWM's corresponding position(within the acceptable range).
     Update the current PWM variable of the servo.
 */
-void Servo_Move(ServoType* Serv, unsigned int desiredPWM);
+void servoMove(ServoType* Serv, unsigned int desiredPWM);
 /*
   Function Name: Servo_Move_Segmented
   Input: 
@@ -37,7 +37,7 @@ void Servo_Move(ServoType* Serv, unsigned int desiredPWM);
     Desired PWM to move to
   Purpose: Move servo to the desiredPWM position using incremental PWM values between the current angle and the desiredPWM
 */
-void Servo_Move_Segmented(ServoType *Serv, unsigned int desiredPWM, unsigned int seg);
+void servoMoveSegmented(ServoType *Serv, unsigned int desiredPWM, unsigned int seg);
 
 /*
   Function Name: Servo_Invert_At_Speed
@@ -47,4 +47,4 @@ void Servo_Move_Segmented(ServoType *Serv, unsigned int desiredPWM, unsigned int
     
   Purpose: Invert the position of the servo (close to open and vice-versa) at an arbitrary fast or slow speed*/
   
-void Servo_Invert_At_Speed(ServoType *Serv,  unsigned int isFast);
+void servoInvertAtSpeed(ServoType *Serv,  unsigned int isFast);

@@ -1,9 +1,4 @@
 /*
-  TODO:
-  1. DETERMINE HOW SPEED OF HAND OPENING AND CLOSING SHOULD BE CONTROLLED... MAP AN INPUT SPEED TO NUMBER OF SEGMENTS OR DELAY VALUES
-  2. DETERMINE "LEVELS" OF EACH API FUNCTION
-*/
-/*
 ----------------------------------
 -----Includes-----
 ----------------------------------
@@ -42,7 +37,7 @@ typedef struct ServoType
   Input: ServoType Structure (A Servo)
   Purpose: Initializes the pins needed to drive the servo.
 */
-void Servo_init(ServoType *Serv);
+void servoInit(ServoType *Serv);
 /*
   Function Name: Servo_Move
   Input: 
@@ -52,7 +47,7 @@ void Servo_init(ServoType *Serv);
     Move servo to the desiredPWM's corresponding position(within the acceptable range).
     Update the current PWM variable of the servo.
 */
-void Servo_Move(ServoType* Serv, unsigned int desiredPWM);
+void servoMove(ServoType* Serv, unsigned int desiredPWM);
 /*
   Function Name: Servo_Move_Segmented
   Input: 
@@ -60,7 +55,7 @@ void Servo_Move(ServoType* Serv, unsigned int desiredPWM);
     Desired PWM to move to
   Purpose: Move servo to the desiredPWM position using incremental PWM values between the current angle and the desiredPWM
 */
-void Servo_Move_Segmented(ServoType *Serv, unsigned int desiredPWM, unsigned int seg);
+void servoMoveSegmented(ServoType *Serv, unsigned int desiredPWM, unsigned int seg);
 
 /*Max's Math Code. Comment this stuff later*/
 long constrain(long x, long in_min, long in_max) 
@@ -91,17 +86,17 @@ void setup()
   testServo.zServoPin = 3;
   testServo.zServoPWMOpen = 250;
   testServo.zServoPWMClosed = 65;
-  Servo_init(&testServo);
+  servoInit(&testServo);
   delay(1000);
   Serial.println("Init Complete");  // Debug Code
-  Servo_Move(&testServo, 250);
+  servoMove(&testServo, 250);
   delay(1000);
-  Servo_Move(&testServo, 65);
+  servoMove(&testServo, 65);
 }
 https://docs.google.com/document/d/1P_BeJH5wWfhm9kize7KvitGLEQI_--hjxDYvU9wtM60/edit
 void loop() 
 {
-  Servo_Move_Segmented(&testServo, 65,7);
+  servoMoveSegmented(&testServo, 65,7);
   Serial.print("Move 1 to ");
   Serial.println(testServo.zServoPWMCurrent);   // Debug Code
   delay(1000);
@@ -130,12 +125,12 @@ long map(long x, long in_min, long in_max, long out_min, long out_max)
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-void Servo_init(ServoType *Serv)
+void servoInit(ServoType *Serv)
 {
   pinMode(Serv->zServoPin,OUTPUT);
 }
 
-void Servo_Move(ServoType* Serv, unsigned int desiredPWM)
+void servoMove(ServoType* Serv, unsigned int desiredPWM)
 {
   //unsigned int newPWM;
   /* Limits PWM Values between the 'open' and 'closed' values*/
