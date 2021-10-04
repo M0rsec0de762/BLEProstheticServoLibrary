@@ -21,11 +21,10 @@ typedef struct ServoType
 {
   Servo ZServ; // Uses <Servo.h>'s class in order to init and control the servo
   unsigned int z_servo_pin;
-  // unsigned int zServoPeriod;
-  // unsigned int zServoDutyCycle;
-  unsigned int z_servo_PWM_open; 
-  unsigned int z_servo_PWM_closed;   // Note: Open and Closed values represent the limits of the PWM
-  unsigned int z_servo_PWM_current;
+  unsigned int z_servo_micro_open; 
+  unsigned int z_servo_micro_closed;   // Note: Open and Closed values represent the limits of the PWM
+  unsigned int z_servo_micro_current;
+  unsigned int z_MOSFET_pin;
 };
 
 /*
@@ -57,6 +56,21 @@ void servoMove(ServoType* Serv, unsigned int desiredPWM);
   Purpose: Move servo to the desiredPWM position using incremental PWM values between the current angle and the desiredPWM
 */
 void servoMoveSegmented(ServoType *Serv, unsigned int desiredPWM, unsigned int seg);
+/*
+  Function Name: servoOpen
+  Input: 
+    ServoType Structure (A Servo)
+  Purpose: Open Hand
+*/
+void servoOpen(ServoType *Serv);
+/*
+  Function Name: servoOpen
+  Input: 
+    ServoType Structure (A Servo)
+  Purpose: Close Hand
+*/
+void servoClosed(ServoType *Serv);
+
 
 /*Max's Math Code. Comment this stuff later*/
 // long constrain(long x, long in_min, long in_max) 
@@ -85,10 +99,14 @@ void setup()
   Serial.begin(9600);
   /*Init servo with only the pwm pin, and open/closed pulse widths*/
   testServo.z_servo_pin = 3;
-  testServo.z_servo_PWM_open = 2500;
-  testServo.z_servo_PWM_closed = 500;
+  testServo.z_servo_micro_open = 2500;
+  testServo.z_servo_micro_closed = 500;
+  testServo.z_MOSFET_pin = 8;
   servoInit(&testServo);
   Serial.println("Init Complete");  // Debug Code
+  servoClosed(&testServo);
+  delay(2000);
+  servoOpen(&testServo);
 }
 //https://docs.google.com/document/d/1P_BeJH5wWfhm9kize7KvitGLEQI_--hjxDYvU9wtM60/edit
 void loop() 
@@ -125,7 +143,9 @@ void loop()
 void servoInit(ServoType *Serv)
 {
   Serv->ZServ.attach(Serv->z_servo_pin);
-  servoMove(Serv,Serv->z_servo_PWM_open);
+  pinMode(Serv->z_MOSFET_pin,OUTPUT);
+  digitalWrite(Serv->z_MOSFET_pin,HIGH);
+  servoMove(Serv,Serv->z_servo_micro_open);
 }
 
 void servoMove(ServoType* Serv, unsigned int desiredPWM)
@@ -133,13 +153,13 @@ void servoMove(ServoType* Serv, unsigned int desiredPWM)
   unsigned int newPWM;
   /* Limits PWM Values between the 'open' and 'closed' values*/
   // Serv->z_servo_PWM_current = constrain(desiredPWM, Serv->z_servo_PWM_closed, Serv->z_servo_PWM_open);
-  if(desiredPWM >= Serv->z_servo_PWM_open)
+  if(desiredPWM >= Serv->z_servo_micro_open)
   {
-    newPWM = Serv->z_servo_PWM_open;
+    newPWM = Serv->z_servo_micro_open;
   }
-  else if (desiredPWM <= Serv->z_servo_PWM_closed)
+  else if (desiredPWM <= Serv->z_servo_micro_closed)
   {
-    newPWM = Serv->z_servo_PWM_closed;
+    newPWM = Serv->z_servo_micro_closed;
   }
   else
   {
@@ -147,14 +167,14 @@ void servoMove(ServoType* Serv, unsigned int desiredPWM)
   }
 
   /* Creates new current value and writes it to the pin */
-  Serv->z_servo_PWM_current = newPWM;
+  Serv->z_servo_micro_current = newPWM;
   Serv->ZServ.writeMicroseconds(newPWM);
 }
 
 void servoMoveSegmented(ServoType *Serv, unsigned int desiredPWM, unsigned int seg)
 {
   /* Calculates signed difference between starting and final PWM*/
-  int diff = (int)Serv->z_servo_PWM_current - (int)desiredPWM;
+  int diff = (int)Serv->z_servo_micro_current - (int)desiredPWM;
 
   int segDiff;
   /*Based on the sign of diff, this mitigates the possibility of integer division truncation*/
@@ -179,35 +199,49 @@ void servoMoveSegmented(ServoType *Serv, unsigned int desiredPWM, unsigned int s
     /*Prevents code from writing beyond the desiredPWM value*/
     if(segDiff > 0)
     {
-      if(Serv->z_servo_PWM_current - (segDiff) < desiredPWM)
+      if(Serv->z_servo_micro_current - (segDiff) < desiredPWM)
       {
-        Serv->z_servo_PWM_current = desiredPWM;
+        Serv->z_servo_micro_current = desiredPWM;
         segDiff = 0;
       }
     }
     else if(segDiff < 0)
     {
-      if(Serv->z_servo_PWM_current - (segDiff) > desiredPWM)
+      if(Serv->z_servo_micro_current - (segDiff) > desiredPWM)
       {
-        Serv->z_servo_PWM_current = desiredPWM;
+        Serv->z_servo_micro_current = desiredPWM;
         segDiff = 0;
       }
     }
     //-------------------TEST CODE END--------------------
-    Serial.println(Serv->z_servo_PWM_current - (segDiff)); // Debug Code
+    Serial.println(Serv->z_servo_micro_current - (segDiff)); // Debug Code
 
-    servoMove(Serv,Serv->z_servo_PWM_current - (segDiff));
+    servoMove(Serv,Serv->z_servo_micro_current - (segDiff));
 
     delay(90);
   }
 }
 
+
+void servoOpen(ServoType *Serv)
+{
+  digitalWrite(Serv->z_MOSFET_pin,HIGH);
+  servoMove(Serv,Serv->z_servo_micro_open);
+  delay(1000);
+  digitalWrite(Serv->z_MOSFET_pin,LOW);
+}
+
+void servoClosed(ServoType *Serv)
+{
+  digitalWrite(Serv->z_MOSFET_pin,HIGH);
+  servoMove(Serv,Serv->z_servo_micro_closed);
+}
 void Servo_Invert_At_Speed(ServoType *Serv, uint8_t isFast)
 {
   uint8_t openServo = 0;
   
   //Determine if opening or closing
-  if(Serv->z_servo_PWM_current == Serv->z_servo_PWM_closed)
+  if(Serv->z_servo_micro_current == Serv->z_servo_micro_closed)
   {
     openServo = 1;
   }
@@ -224,18 +258,18 @@ void Servo_Invert_At_Speed(ServoType *Serv, uint8_t isFast)
   //Calculates time delay after each segment of the inversion
   int timeDelay = (totalTime - SERVO_SPEED) / REDUCTION_STEPS;
   
-  unsigned int pwmStep = (Serv->z_servo_PWM_open - Serv->z_servo_PWM_closed) / REDUCTION_STEPS;
+  unsigned int pwmStep = (Serv->z_servo_micro_open - Serv->z_servo_micro_closed) / REDUCTION_STEPS;
 
   //move servo step by step
   for(int i = 0; i < REDUCTION_STEPS; ++i)
   {
     if(openServo)
     {
-      servoMove(Serv,Serv->z_servo_PWM_current + pwmStep);
+      servoMove(Serv,Serv->z_servo_micro_current + pwmStep);
     }
     else
     {
-      servoMove(Serv,Serv->z_servo_PWM_current - pwmStep);
+      servoMove(Serv,Serv->z_servo_micro_current - pwmStep);
     }
     
     delay(timeDelay);
