@@ -10,12 +10,6 @@
 ----------------------------------
 */
 
-//Speed of the servo as ms/180 deg
-#define SERVO_SPEED 390
-#define FAST_MOVE 1
-#define SLOW_MOVE 6
-#define REDUCTION_STEPS 17
-
 /*Type definition for a structure regarding servos.*/
 typedef struct ServoType
 {
@@ -81,17 +75,6 @@ void servoClosed(ServoType *Serv);
 /*Max's Math Code. Comment this stuff later*/
 // long constrain(long x, long in_min, long in_max) 
 // long map(long x, long in_min, long in_max, long out_min, long out_max) 
-
-/*
-  Function Name: Servo_Invert_At_Speed
-  Input: 
-    ServoType Structure (A Servo)
-    Speed will be moving fast or slow (1 or 0)
-    
-  Purpose: Invert the position of the servo (close to open and vice-versa) at an arbitrary fast or slow speed*/
-  
-void Servo_Invert_At_Speed(ServoType *Serv, uint8_t isFast);
-
 /*
 ----------------------------------
 -------------Main Code------------
@@ -260,44 +243,4 @@ void servoClosed(ServoType *Serv)
 {
   digitalWrite(Serv->z_MOSFET_pin,HIGH);
   servoMoveSegmented(Serv,Serv->z_servo_micro_closed,20);
-}
-
-void Servo_Invert_At_Speed(ServoType *Serv, uint8_t isFast)
-{
-  uint8_t openServo = 0;
-  
-  //Determine if opening or closing
-  if(Serv->z_servo_micro_current == Serv->z_servo_micro_closed)
-  {
-    openServo = 1;
-  }
-  
-  //Determine delay needed at each position 
-  int totalTime = SERVO_SPEED;
-
-  //Multiples total time for inversion based on speed chosen
-  if(!isFast)
-  {
-    totalTime *= SLOW_MOVE; 
-  }
-
-  //Calculates time delay after each segment of the inversion
-  int timeDelay = (totalTime - SERVO_SPEED) / REDUCTION_STEPS;
-  
-  unsigned int microStep = (Serv->z_servo_micro_open - Serv->z_servo_micro_closed) / REDUCTION_STEPS;
-
-  //move servo step by step
-  for(int i = 0; i < REDUCTION_STEPS; ++i)
-  {
-    if(openServo)
-    {
-      servoMove(Serv,Serv->z_servo_micro_current + microStep);
-    }
-    else
-    {
-      servoMove(Serv,Serv->z_servo_micro_current - microStep);
-    }
-    
-    delay(timeDelay);
-  }
 }
