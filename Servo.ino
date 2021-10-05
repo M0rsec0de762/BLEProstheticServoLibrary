@@ -27,6 +27,7 @@ typedef struct ServoType
   unsigned int z_servo_micro_max;
   unsigned int z_servo_micro_min;
   unsigned int z_MOSFET_pin;
+  unsigned int z_servo_speed;
 };
 
 /*
@@ -107,6 +108,7 @@ void setup()
   testServo.z_servo_micro_max = 2500;
   testServo.z_servo_micro_min = 500;
   testServo.z_MOSFET_pin = 8;
+  testServo.z_servo_speed = 210;
   servoInit(&testServo);
   Serial.println("Init Complete");  // Debug Code
 
@@ -230,7 +232,17 @@ void servoMoveSegmented(ServoType *Serv, unsigned int desiredMicro, unsigned int
 
     servoMove(Serv,Serv->z_servo_micro_current - (segDiff));
 
-    delay(90);  // This is hard coded, this may need to change
+    //ADDED DELAY MATH
+    unsigned int dlay = 0;
+
+    if(segDiff < 0)
+      dlay = (unsigned int)((map(segDiff, 0, -2000, 0 , 180) / 60.0) * Serv->z_servo_speed) + 1;
+    else
+      dlay = (unsigned int)((map(segDiff, 0, 2000, 0 , 180) / 60.0) * Serv->z_servo_speed) + 1;
+    
+    //Serial.println(dlay);
+      
+    delay(dlay);
   }
 
 }
