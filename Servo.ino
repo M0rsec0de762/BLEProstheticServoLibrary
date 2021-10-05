@@ -21,12 +21,14 @@ typedef struct ServoType
 {
   Servo ZServ; // Uses <Servo.h>'s class in order to init and control the servo
   unsigned int z_servo_pin;
+  /* 'micro' defines microseconds of high time within a PWM signal */
   unsigned int z_servo_micro_open; 
-  unsigned int z_servo_micro_closed;   // Note: Open and Closed values represent the limits of the micro
+  unsigned int z_servo_micro_closed;  
   unsigned int z_servo_micro_current;
   unsigned int z_servo_micro_max;
   unsigned int z_servo_micro_min;
   unsigned int z_MOSFET_pin;
+  /* Defines speed in degrees per second */
   unsigned int z_servo_speed;
 };
 
