@@ -236,9 +236,9 @@ void servoMoveSegmented(ServoType *Serv, unsigned int desiredMicro, unsigned int
     unsigned int dlay = 0;
 
     if(segDiff < 0)
-      dlay = (unsigned int)((map(segDiff, 0, -2000, 0 , 60) / 60.0) * Serv->z_servo_speed);
+      dlay = (unsigned int)((map(segDiff, 0, -2000, 0 , 180) / 60.0) * Serv->z_servo_speed) + 1;
     else
-      dlay = (unsigned int)((map(segDiff, 0, 2000, 0 , 60) / 60.0) * Serv->z_servo_speed);
+      dlay = (unsigned int)((map(segDiff, 0, 2000, 0 , 180) / 60.0) * Serv->z_servo_speed) + 1;
     
     //Serial.println(dlay);
       
