@@ -22,8 +22,10 @@ typedef struct ServoType
   Servo ZServ; // Uses <Servo.h>'s class in order to init and control the servo
   unsigned int z_servo_pin;
   unsigned int z_servo_micro_open; 
-  unsigned int z_servo_micro_closed;   // Note: Open and Closed values represent the limits of the PWM
+  unsigned int z_servo_micro_closed;   // Note: Open and Closed values represent the limits of the micro
   unsigned int z_servo_micro_current;
+  unsigned int z_servo_micro_max;
+  unsigned int z_servo_micro_min;
   unsigned int z_MOSFET_pin;
 };
 
@@ -35,39 +37,40 @@ typedef struct ServoType
 /*
   Function Name: servoInit
   Input: ServoType Structure (A Servo)
-  Purpose: Initializes the pins needed to drive the servo.
+  Purpose: Initializes the pins needed to drive the servo. Sets servo to open position
 */
 void servoInit(ServoType *Serv);
 /*
   Function Name: servoMove
   Input: 
     ServoType Structure (A Servo)
-    Desired PWM to move to
+    Desired micro to move to
   Purpose: 
-    Move servo to the desiredPWM's corresponding position(within the acceptable range).
-    Update the current PWM variable of the servo.
+    Move servo to the desiredMicro's corresponding position(within the acceptable range).
+    Update the current micro variable of the servo.
+    Clamps open and closed micro values to min and max values if they exceed min and max values.
 */
-void servoMove(ServoType* Serv, unsigned int desiredPWM);
+void servoMove(ServoType* Serv, unsigned int desiredMicro);
 /*
   Function Name: servoMoveSegmented
   Input: 
     ServoType Structure (A Servo)
-    Desired PWM to move to
-  Purpose: Move servo to the desiredPWM position using incremental PWM values between the current angle and the desiredPWM
+    Desired micro to move to
+  Purpose: Move servo to the desiredMicro position using incremental micro values between the current angle and the desiredMicro
 */
-void servoMoveSegmented(ServoType *Serv, unsigned int desiredPWM, unsigned int seg);
+void servoMoveSegmented(ServoType *Serv, unsigned int desiredMicro, unsigned int seg);
 /*
   Function Name: servoOpen
   Input: 
     ServoType Structure (A Servo)
-  Purpose: Open Hand
+  Purpose: Turn on MOSFET, open hand, turn off MOSFET
 */
 void servoOpen(ServoType *Serv);
 /*
   Function Name: servoOpen
   Input: 
     ServoType Structure (A Servo)
-  Purpose: Close Hand
+  Purpose: Turn on MOSFET, close hand, leave MOSFET on
 */
 void servoClosed(ServoType *Serv);
 
@@ -97,28 +100,28 @@ void setup()
 {
   /*Init Serial Line for Arduino debugging purposes*/
   Serial.begin(9600);
-  /*Init servo with only the pwm pin, and open/closed pulse widths*/
+  /*Init servo with only the micro pin, and open/closed pulse widths*/
   testServo.z_servo_pin = 3;
   testServo.z_servo_micro_open = 2500;
   testServo.z_servo_micro_closed = 500;
+  testServo.z_servo_micro_max = 2500;
+  testServo.z_servo_micro_min = 500;
   testServo.z_MOSFET_pin = 8;
   servoInit(&testServo);
   Serial.println("Init Complete");  // Debug Code
-  servoClosed(&testServo);
-  delay(2000);
-  servoOpen(&testServo);
+
 }
-//https://docs.google.com/document/d/1P_BeJH5wWfhm9kize7KvitGLEQI_--hjxDYvU9wtM60/edit
+
 void loop() 
 {
-  // servoMoveSegmented(&testServo, 2500,20);
-  // Serial.print("Move 1 to ");
-  // Serial.println(testServo.z_servo_PWM_current);   // Debug Code
-  // delay(1000);
-  // servoMoveSegmented(&testServo, 500,20);
-  // Serial.print("Move 2 to ");
-  // Serial.println(testServo.z_servo_PWM_current);   // Debug Code
-  // delay(1000);
+  servoOpen(&testServo);
+  Serial.print("Move 1 to open: ");
+  Serial.println(testServo.z_servo_micro_current);   // Debug Code
+  delay(1000);
+  servoClosed(&testServo);
+  Serial.print("Move 2 to closed: ");
+  Serial.println(testServo.z_servo_micro_current);   // Debug Code
+  delay(1000);
 }
 
 
@@ -146,35 +149,44 @@ void servoInit(ServoType *Serv)
   pinMode(Serv->z_MOSFET_pin,OUTPUT);
   digitalWrite(Serv->z_MOSFET_pin,HIGH);
   servoMove(Serv,Serv->z_servo_micro_open);
+
+  if(Serv->z_servo_micro_closed < Serv->z_servo_micro_min)
+    Serv->z_servo_micro_closed = Serv->z_servo_micro_min;
+  else if(Serv->z_servo_micro_closed < Serv->z_servo_micro_max)
+    Serv->z_servo_micro_closed = Serv->z_servo_micro_max;
+  if(Serv->z_servo_micro_open < Serv->z_servo_micro_min)
+    Serv->z_servo_micro_open = Serv->z_servo_micro_min;
+  else if(Serv->z_servo_micro_open < Serv->z_servo_micro_max)
+    Serv->z_servo_micro_open = Serv->z_servo_micro_max;
 }
 
-void servoMove(ServoType* Serv, unsigned int desiredPWM)
+/*DONT USE servoMove in the main loop, ONLY USE servoOpen and servoClosed. They have MOSFET control code*/
+void servoMove(ServoType* Serv, unsigned int desiredMicro)
 {
-  unsigned int newPWM;
-  /* Limits PWM Values between the 'open' and 'closed' values*/
-  // Serv->z_servo_PWM_current = constrain(desiredPWM, Serv->z_servo_PWM_closed, Serv->z_servo_PWM_open);
-  if(desiredPWM >= Serv->z_servo_micro_open)
+  unsigned int newMicro;
+  /* Limits micro Values between the 'open' and 'closed' values*/
+  if(desiredMicro >= Serv->z_servo_micro_max)
   {
-    newPWM = Serv->z_servo_micro_open;
+    newMicro = Serv->z_servo_micro_max;
   }
-  else if (desiredPWM <= Serv->z_servo_micro_closed)
+  else if (desiredMicro <= Serv->z_servo_micro_min)
   {
-    newPWM = Serv->z_servo_micro_closed;
+    newMicro = Serv->z_servo_micro_min;
   }
   else
   {
-    newPWM = desiredPWM;
+    newMicro = desiredMicro;
   }
 
   /* Creates new current value and writes it to the pin */
-  Serv->z_servo_micro_current = newPWM;
-  Serv->ZServ.writeMicroseconds(newPWM);
+  Serv->z_servo_micro_current = newMicro;
+  Serv->ZServ.writeMicroseconds(newMicro);
 }
 
-void servoMoveSegmented(ServoType *Serv, unsigned int desiredPWM, unsigned int seg)
+void servoMoveSegmented(ServoType *Serv, unsigned int desiredMicro, unsigned int seg)
 {
-  /* Calculates signed difference between starting and final PWM*/
-  int diff = (int)Serv->z_servo_micro_current - (int)desiredPWM;
+  /* Calculates signed difference between starting and final Micro*/
+  int diff = (int)Serv->z_servo_micro_current - (int)desiredMicro;
 
   int segDiff;
   /*Based on the sign of diff, this mitigates the possibility of integer division truncation*/
@@ -192,24 +204,24 @@ void servoMoveSegmented(ServoType *Serv, unsigned int desiredPWM, unsigned int s
   }
 
   unsigned int i;
-  /* Moves Servo to desired endpoint using segmented points in between the starting and final PWM */
+  /* Moves Servo to desired endpoint using segmented points in between the starting and final micro */
   for(i = 0; i < seg; i++)
   {
     //-------------------TEST CODE START------------------
-    /*Prevents code from writing beyond the desiredPWM value*/
+    /*Prevents code from writing beyond the desiredMicro value*/
     if(segDiff > 0)
     {
-      if(Serv->z_servo_micro_current - (segDiff) < desiredPWM)
+      if(Serv->z_servo_micro_current - (segDiff) < desiredMicro)
       {
-        Serv->z_servo_micro_current = desiredPWM;
+        Serv->z_servo_micro_current = desiredMicro;
         segDiff = 0;
       }
     }
     else if(segDiff < 0)
     {
-      if(Serv->z_servo_micro_current - (segDiff) > desiredPWM)
+      if(Serv->z_servo_micro_current - (segDiff) > desiredMicro)
       {
-        Serv->z_servo_micro_current = desiredPWM;
+        Serv->z_servo_micro_current = desiredMicro;
         segDiff = 0;
       }
     }
@@ -218,24 +230,24 @@ void servoMoveSegmented(ServoType *Serv, unsigned int desiredPWM, unsigned int s
 
     servoMove(Serv,Serv->z_servo_micro_current - (segDiff));
 
-    delay(90);
+    delay(90);  // This is hard coded, this may need to change
   }
-}
 
+}
 
 void servoOpen(ServoType *Serv)
 {
   digitalWrite(Serv->z_MOSFET_pin,HIGH);
-  servoMove(Serv,Serv->z_servo_micro_open);
-  delay(1000);
+  servoMoveSegmented(Serv,Serv->z_servo_micro_open,20);
   digitalWrite(Serv->z_MOSFET_pin,LOW);
 }
 
 void servoClosed(ServoType *Serv)
 {
   digitalWrite(Serv->z_MOSFET_pin,HIGH);
-  servoMove(Serv,Serv->z_servo_micro_closed);
+  servoMoveSegmented(Serv,Serv->z_servo_micro_closed,20);
 }
+
 void Servo_Invert_At_Speed(ServoType *Serv, uint8_t isFast)
 {
   uint8_t openServo = 0;
@@ -258,18 +270,18 @@ void Servo_Invert_At_Speed(ServoType *Serv, uint8_t isFast)
   //Calculates time delay after each segment of the inversion
   int timeDelay = (totalTime - SERVO_SPEED) / REDUCTION_STEPS;
   
-  unsigned int pwmStep = (Serv->z_servo_micro_open - Serv->z_servo_micro_closed) / REDUCTION_STEPS;
+  unsigned int microStep = (Serv->z_servo_micro_open - Serv->z_servo_micro_closed) / REDUCTION_STEPS;
 
   //move servo step by step
   for(int i = 0; i < REDUCTION_STEPS; ++i)
   {
     if(openServo)
     {
-      servoMove(Serv,Serv->z_servo_micro_current + pwmStep);
+      servoMove(Serv,Serv->z_servo_micro_current + microStep);
     }
     else
     {
-      servoMove(Serv,Serv->z_servo_micro_current - pwmStep);
+      servoMove(Serv,Serv->z_servo_micro_current - microStep);
     }
     
     delay(timeDelay);
