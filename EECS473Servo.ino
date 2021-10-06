@@ -88,7 +88,7 @@ void setup()
   Serial.begin(9600);
   /*Init servo with only the micro pin, and open/closed pulse widths*/
   testServo.z_servo_pin = 3;
-  testServo.z_servo_micro_open = 2500;
+  testServo.z_servo_micro_open = 2300;
   testServo.z_servo_micro_closed = 500;
   testServo.z_servo_micro_max = 2500;
   testServo.z_servo_micro_min = 500;
@@ -222,9 +222,9 @@ void servoMoveSegmented(ServoType *Serv, unsigned int desiredMicro, unsigned int
     unsigned int dlay = 0;
 
     if(segDiff < 0)
-      dlay = (unsigned int)((map(segDiff, 0, -2000, 0 , 180) / 60.0) * Serv->z_servo_speed) + 1;
+      dlay = (unsigned int)(((map(segDiff, 0, -2000, 0 , 180) / 60.0) * Serv->z_servo_speed) * 1.5);
     else
-      dlay = (unsigned int)((map(segDiff, 0, 2000, 0 , 180) / 60.0) * Serv->z_servo_speed) + 1;
+      dlay = (unsigned int)(((map(segDiff, 0, 2000, 0 , 180) / 60.0) * Serv->z_servo_speed) * 1.5);
     
     //Serial.println(dlay);
       
