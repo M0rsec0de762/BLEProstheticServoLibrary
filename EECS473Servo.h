@@ -1,12 +1,30 @@
+// The following tutorials were used to create this library:
+// https://www.arduino.cc/en/Hacking/LibraryTutorial
+// https://www.arduino.cc/en/guide/libraries
+#ifndef Morse_h
+#define Morse_h
+#include "Servo.h"
+#include "Arduino.h"
+/*
+----------------------------------
+-------------Type Definitions-----
+----------------------------------
+*/
+
 /*Type definition for a structure regarding servos.*/
 typedef struct ServoType
 {
-  unsigned int zServoPin;
-  // unsigned int zServoPeriod;
-  // unsigned int zServoDutyCycle;
-  unsigned int zServoPWMOpen; 
-  unsigned int zServoPWMClosed;   // Note: Open and Closed values represent the limits of the PWM
-  unsigned int zServoPWMCurrent;
+  Servo ZServ; // Uses <Servo.h>'s class in order to init and control the servo
+  unsigned int z_servo_pin;
+  /* 'micro' defines microseconds of high time within a PWM signal */
+  unsigned int z_servo_micro_open; 
+  unsigned int z_servo_micro_closed;  
+  unsigned int z_servo_micro_current;
+  unsigned int z_servo_micro_max;
+  unsigned int z_servo_micro_min;
+  unsigned int z_MOSFET_pin;
+  /* Defines speed in degrees per second */
+  unsigned int z_servo_speed;
 };
 
 /*
@@ -15,36 +33,48 @@ typedef struct ServoType
 ----------------------------------
 */
 /*
-  Function Name: Servo_init
+  Function Name: servoInit
   Input: ServoType Structure (A Servo)
-  Purpose: Initializes the pins needed to drive the servo.
+  Purpose: Initializes the pins needed to drive the servo. Sets servo to open position
 */
 void servoInit(ServoType *Serv);
 /*
-  Function Name: Servo_Move
+  Function Name: servoMove
   Input: 
     ServoType Structure (A Servo)
-    Desired PWM to move to
+    Desired micro to move to
   Purpose: 
-    Move servo to the desiredPWM's corresponding position(within the acceptable range).
-    Update the current PWM variable of the servo.
+    Move servo to the desiredMicro's corresponding position(within the acceptable range).
+    Update the current micro variable of the servo.
+    Clamps open and closed micro values to min and max values if they exceed min and max values.
 */
-void servoMove(ServoType* Serv, unsigned int desiredPWM);
+void servoMove(ServoType* Serv, unsigned int desiredMicro);
 /*
-  Function Name: Servo_Move_Segmented
+  Function Name: servoMoveSegmented
   Input: 
     ServoType Structure (A Servo)
-    Desired PWM to move to
-  Purpose: Move servo to the desiredPWM position using incremental PWM values between the current angle and the desiredPWM
+    Desired micro to move to
+  Purpose: Move servo to the desiredMicro position using incremental micro values between the current angle and the desiredMicro
 */
-void servoMoveSegmented(ServoType *Serv, unsigned int desiredPWM, unsigned int seg);
+void servoMoveSegmented(ServoType *Serv, unsigned int desiredMicro, unsigned int seg);
+/*
+  Function Name: servoOpen
+  Input: 
+    ServoType Structure (A Servo)
+  Purpose: Turn on MOSFET, open hand, turn off MOSFET
+*/
+void servoOpen(ServoType *Serv);
+/*
+  Function Name: servoOpen
+  Input: 
+    ServoType Structure (A Servo)
+  Purpose: Turn on MOSFET, close hand, leave MOSFET on
+*/
+void servoClosed(ServoType *Serv);
 
-/*
-  Function Name: Servo_Invert_At_Speed
-  Input: 
-    ServoType Structure (A Servo)
-    Speed will be moving fast or slow (1 or 0)
-    
-  Purpose: Invert the position of the servo (close to open and vice-versa) at an arbitrary fast or slow speed*/
-  
-void servoInvertAtSpeed(ServoType *Serv,  unsigned int isFast);
+
+/*Max's Math Code. Comment this stuff later*/
+// long constrain(long x, long in_min, long in_max) 
+// long map(long x, long in_min, long in_max, long out_min, long out_max) 
+
+#endif
