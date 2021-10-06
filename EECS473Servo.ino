@@ -139,11 +139,12 @@ void servoInit(ServoType *Serv)
 
   if(Serv->z_servo_micro_closed < Serv->z_servo_micro_min)
     Serv->z_servo_micro_closed = Serv->z_servo_micro_min;
-  else if(Serv->z_servo_micro_closed < Serv->z_servo_micro_max)
+  else if(Serv->z_servo_micro_closed > Serv->z_servo_micro_max)
     Serv->z_servo_micro_closed = Serv->z_servo_micro_max;
+
   if(Serv->z_servo_micro_open < Serv->z_servo_micro_min)
     Serv->z_servo_micro_open = Serv->z_servo_micro_min;
-  else if(Serv->z_servo_micro_open < Serv->z_servo_micro_max)
+  else if(Serv->z_servo_micro_open > Serv->z_servo_micro_max)
     Serv->z_servo_micro_open = Serv->z_servo_micro_max;
 }
 
