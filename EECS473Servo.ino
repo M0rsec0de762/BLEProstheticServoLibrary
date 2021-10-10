@@ -80,35 +80,62 @@ void servoClosed(ServoType *Serv);
 -------------Main Code------------
 ----------------------------------
 */
-ServoType testServo;
+ServoType testServo1;
+ServoType testServo2;
 
 void setup() 
 {
   /*Init Serial Line for Arduino debugging purposes*/
   Serial.begin(9600);
-  /*Init servo with only the micro pin, and open/closed pulse widths*/
-  testServo.z_servo_pin = 3;
-  testServo.z_servo_micro_open = 2500;
-  testServo.z_servo_micro_closed = 500;
-  testServo.z_servo_micro_max = 2500;
-  testServo.z_servo_micro_min = 500;
-  testServo.z_MOSFET_pin = 8;
-  testServo.z_servo_speed = 210;
-  servoInit(&testServo);
+  /*Init servo 1 with only the micro pin, and open/closed pulse widths*/
+  testServo1.z_servo_pin = 3;
+  testServo1.z_servo_micro_open = 2500;
+  testServo1.z_servo_micro_closed = 500;
+  testServo1.z_servo_micro_max = 2500;
+  testServo1.z_servo_micro_min = 500;
+  testServo1.z_MOSFET_pin = 8;
+  testServo1.z_servo_speed = 210;
+  servoInit(&testServo1);
+  /*Init servo 2 with only the micro pin, and open/closed pulse widths*/
+  testServo2.z_servo_pin = 5;
+  testServo2.z_servo_micro_open = 2500;
+  testServo2.z_servo_micro_closed = 500;
+  testServo2.z_servo_micro_max = 2500;
+  testServo2.z_servo_micro_min = 500;
+  testServo2.z_MOSFET_pin = 7;
+  testServo2.z_servo_speed = 210;
+  servoInit(&testServo2);
   Serial.println("Init Complete");  // Debug Code
 
 }
 
 void loop() 
 {
-  servoOpen(&testServo);
-  Serial.print("Move 1 to open: ");
-  Serial.println(testServo.z_servo_micro_current);   // Debug Code
+  /* Debug Code Start*/
+  Serial.print("Move Servo 1 to closed: ");
+  Serial.println(testServo1.z_servo_micro_current);  
+  /* Debug Code End */
+  servoClosed(&testServo1);
   delay(1000);
-  servoClosed(&testServo);
-  Serial.print("Move 2 to closed: ");
-  Serial.println(testServo.z_servo_micro_current);   // Debug Code
+  /* Debug Code Start*/
+  Serial.print("Move Servo 1 to open: ");
+  Serial.println(testServo1.z_servo_micro_current);   
+  /* Debug Code End */
+  servoOpen(&testServo1);
   delay(1000);
+  /* Debug Code Start*/
+  Serial.print("Move Servo 2 to closed: ");
+  Serial.println(testServo2.z_servo_micro_current);  
+  /* Debug Code End */
+  servoClosed(&testServo2);
+  delay(1000);
+  /* Debug Code Start*/
+  Serial.print("Move Servo 2 to open: ");
+  Serial.println(testServo2.z_servo_micro_current);   
+  /* Debug Code End */
+  servoOpen(&testServo2);
+  delay(1000);
+
 }
 
 
