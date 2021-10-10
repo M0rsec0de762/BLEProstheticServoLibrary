@@ -7,6 +7,13 @@
 
 /*
 ----------------------------------
+---Variable Defines-------
+----------------------------------
+*/
+#define SERVO_MAX_TRAVEL 150
+#define SERVO_PULSE_RANGE 1400
+/*
+----------------------------------
 ---Function Initializations-------
 ----------------------------------
 */
@@ -115,9 +122,9 @@ void servoMoveSegmented(ServoType *Serv, unsigned int desiredMicro, unsigned int
     unsigned int dlay = 0;
 
     if(segDiff < 0)
-      dlay = (unsigned int)(((map(segDiff, 0, -2000, 0 , 180) / 60.0) * Serv->z_servo_speed) + 1);
+      dlay = (unsigned int)(((map(segDiff, 0, -SERVO_PULSE_RANGE, 0 , SERVO_MAX_TRAVEL) / 60.0) * Serv->z_servo_speed) + 1);
     else
-      dlay = (unsigned int)(((map(segDiff, 0, 2000, 0 , 180) / 60.0) * Serv->z_servo_speed) + 1);
+      dlay = (unsigned int)(((map(segDiff, 0, SERVO_PULSE_RANGE, 0 , SERVO_MAX_TRAVEL) / 60.0) * Serv->z_servo_speed) + 1);
     
     //Serial.println(dlay);
       
