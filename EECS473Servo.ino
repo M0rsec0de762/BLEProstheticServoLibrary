@@ -96,21 +96,21 @@ void setup()
   /*Init Serial Line for Arduino debugging purposes*/
   Serial.begin(9600);
   /*Init servo 1 with only the micro pin, and open/closed pulse widths*/
-  testServo1.z_servo_pin = 3;
+  testServo1.z_servo_pin = 14;
   testServo1.z_servo_micro_open = 2500;
   testServo1.z_servo_micro_closed = 500;
   testServo1.z_servo_micro_max = 2500;
   testServo1.z_servo_micro_min = 500;
-  testServo1.z_MOSFET_pin = 8;
+  testServo1.z_MOSFET_pin = 23;
   testServo1.z_servo_speed = 210;
   servoInit(&testServo1);
   /*Init servo 2 with only the micro pin, and open/closed pulse widths*/
-  testServo2.z_servo_pin = 5;
+  testServo2.z_servo_pin = 22;
   testServo2.z_servo_micro_open = 2500;
   testServo2.z_servo_micro_closed = 500;
   testServo2.z_servo_micro_max = 2500;
   testServo2.z_servo_micro_min = 500;
-  testServo2.z_MOSFET_pin = 7;
+  testServo2.z_MOSFET_pin = 23;
   testServo2.z_servo_speed = 210;
   servoInit(&testServo2);
   Serial.println("Init Complete");  // Debug Code
