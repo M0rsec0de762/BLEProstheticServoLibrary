@@ -101,11 +101,11 @@ void setup()
   testServo1.z_servo_micro_closed = 500;
   testServo1.z_servo_micro_max = 2500;
   testServo1.z_servo_micro_min = 500;
-  testServo1.z_MOSFET_pin = 23;
+  testServo1.z_MOSFET_pin = 22;
   testServo1.z_servo_speed = 210;
   servoInit(&testServo1);
   /*Init servo 2 with only the micro pin, and open/closed pulse widths*/
-  testServo2.z_servo_pin = 22;
+  testServo2.z_servo_pin = 5;
   testServo2.z_servo_micro_open = 2500;
   testServo2.z_servo_micro_closed = 500;
   testServo2.z_servo_micro_max = 2500;
