@@ -91,8 +91,8 @@ class ArmServo
 -------------Main Code------------
 ----------------------------------
 */
-ServoType testServo1;
-ServoType testServo2;
+ArmServo testServo1;
+ArmServo testServo2;
 
 void setup() 
 {
@@ -106,7 +106,7 @@ void setup()
   testServo1.z_servo_micro_min = 500;
   testServo1.z_MOSFET_pin = 22;
   testServo1.z_servo_speed = 210;
-  servoInit(&testServo1);
+  testServo1.servoInit();
   /*Init servo 2 with only the micro pin, and open/closed pulse widths*/
   testServo2.z_servo_pin = 5;
   testServo2.z_servo_micro_open = 2500;
@@ -115,7 +115,7 @@ void setup()
   testServo2.z_servo_micro_min = 500;
   testServo2.z_MOSFET_pin = 23;
   testServo2.z_servo_speed = 210;
-  servoInit(&testServo2);
+  testServo2.servoInit();
   Serial.println("Init Complete");  // Debug Code
 
 }
@@ -126,25 +126,25 @@ void loop()
   Serial.print("Move Servo 1 to closed: ");
   Serial.println(testServo1.z_servo_micro_current);  
   /* Debug Code End */
-  servoClosed(&testServo1);
+  testServo1.servoClosed();
   delay(1000);
   /* Debug Code Start*/
   Serial.print("Move Servo 1 to open: ");
   Serial.println(testServo1.z_servo_micro_current);   
   /* Debug Code End */
-  servoOpen(&testServo1);
+  testServo1.servoOpen();
   delay(1000);
   /* Debug Code Start*/
   Serial.print("Move Servo 2 to closed: ");
   Serial.println(testServo2.z_servo_micro_current);  
   /* Debug Code End */
-  servoClosed(&testServo2);
+  testServo2.servoClosed();
   delay(1000);
   /* Debug Code Start*/
   Serial.print("Move Servo 2 to open: ");
   Serial.println(testServo2.z_servo_micro_current);   
   /* Debug Code End */
-  servoOpen(&testServo2);
+  testServo2.servoOpen();
   delay(1000);
 
 }
