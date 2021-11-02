@@ -12,6 +12,7 @@
 */
 #define SERVO_MAX_TRAVEL 150
 #define SERVO_PULSE_RANGE 1400
+#define DEBUG 0
 /*
 ----------------------------------
 ---Function Initializations-------
@@ -114,8 +115,9 @@ void ArmServo::servoMoveSegmented(unsigned int desiredMicro, unsigned int seg)
       }
     }
     //-------------------TEST CODE END--------------------
+    #if DEBUG
     Serial.println(z_servo_micro_current - (segDiff)); // Debug Code
-
+    #endif
     servoMove(z_servo_micro_current - (segDiff));
 
     //ADDED DELAY MATH
@@ -125,9 +127,9 @@ void ArmServo::servoMoveSegmented(unsigned int desiredMicro, unsigned int seg)
       dlay = (unsigned int)(((map(segDiff, 0, -SERVO_PULSE_RANGE, 0 , SERVO_MAX_TRAVEL) / 60.0) * z_servo_speed) + 1);
     else
       dlay = (unsigned int)(((map(segDiff, 0, SERVO_PULSE_RANGE, 0 , SERVO_MAX_TRAVEL) / 60.0) * z_servo_speed) + 1);
-    
-    //Serial.println(dlay);
-      
+    #if DEBUG
+    Serial.println(dlay);
+    #endif
     delay(dlay);
   }
 
