@@ -30,36 +30,36 @@
 //   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 // }
 
-void servoInit(ServoType *Serv)
+void ArmServo::servoInit()
 {
-  Serv->ZServ.attach(Serv->z_servo_pin);
-  pinMode(Serv->z_MOSFET_pin,OUTPUT);
-  digitalWrite(Serv->z_MOSFET_pin,HIGH);
-  servoMove(Serv,Serv->z_servo_micro_open);
+  ZServ.attach(z_servo_pin);
+  pinMode(z_MOSFET_pin,OUTPUT);
+  digitalWrite(z_MOSFET_pin,HIGH);
+  servoMove(z_servo_micro_open);
 
-  if(Serv->z_servo_micro_closed < Serv->z_servo_micro_min)
-    Serv->z_servo_micro_closed = Serv->z_servo_micro_min;
-  else if(Serv->z_servo_micro_closed > Serv->z_servo_micro_max)
-    Serv->z_servo_micro_closed = Serv->z_servo_micro_max;
+  if(z_servo_micro_closed < z_servo_micro_min)
+    z_servo_micro_closed = z_servo_micro_min;
+  else if(z_servo_micro_closed > z_servo_micro_max)
+    z_servo_micro_closed = z_servo_micro_max;
 
-  if(Serv->z_servo_micro_open < Serv->z_servo_micro_min)
-    Serv->z_servo_micro_open = Serv->z_servo_micro_min;
-  else if(Serv->z_servo_micro_open > Serv->z_servo_micro_max)
-    Serv->z_servo_micro_open = Serv->z_servo_micro_max;
+  if(z_servo_micro_open < z_servo_micro_min)
+    z_servo_micro_open = z_servo_micro_min;
+  else if(z_servo_micro_open > z_servo_micro_max)
+    z_servo_micro_open = z_servo_micro_max;
 }
 
 /*DONT USE servoMove in the main loop, ONLY USE servoOpen and servoClosed. They have MOSFET control code*/
-void servoMove(ServoType* Serv, unsigned int desiredMicro)
+void ArmServo::servoMove(unsigned int desiredMicro)
 {
   unsigned int newMicro;
   /* Limits micro Values between the 'open' and 'closed' values*/
-  if(desiredMicro >= Serv->z_servo_micro_max)
+  if(desiredMicro >= z_servo_micro_max)
   {
-    newMicro = Serv->z_servo_micro_max;
+    newMicro = z_servo_micro_max;
   }
-  else if (desiredMicro <= Serv->z_servo_micro_min)
+  else if (desiredMicro <= z_servo_micro_min)
   {
-    newMicro = Serv->z_servo_micro_min;
+    newMicro = z_servo_micro_min;
   }
   else
   {
@@ -67,14 +67,14 @@ void servoMove(ServoType* Serv, unsigned int desiredMicro)
   }
 
   /* Creates new current value and writes it to the pin */
-  Serv->z_servo_micro_current = newMicro;
-  Serv->ZServ.writeMicroseconds(newMicro);
+  z_servo_micro_current = newMicro;
+  ZServ.writeMicroseconds(newMicro);
 }
 
-void servoMoveSegmented(ServoType *Serv, unsigned int desiredMicro, unsigned int seg)
+void ArmServo::servoMoveSegmented(unsigned int desiredMicro, unsigned int seg)
 {
   /* Calculates signed difference between starting and final Micro*/
-  int diff = (int)Serv->z_servo_micro_current - (int)desiredMicro;
+  int diff = (int)z_servo_micro_current - (int)desiredMicro;
 
   int segDiff;
   /*Based on the sign of diff, this mitigates the possibility of integer division truncation*/
@@ -99,32 +99,32 @@ void servoMoveSegmented(ServoType *Serv, unsigned int desiredMicro, unsigned int
     /*Prevents code from writing beyond the desiredMicro value*/
     if(segDiff > 0)
     {
-      if(Serv->z_servo_micro_current - (segDiff) < desiredMicro)
+      if(z_servo_micro_current - (segDiff) < desiredMicro)
       {
-        Serv->z_servo_micro_current = desiredMicro;
+        z_servo_micro_current = desiredMicro;
         segDiff = 0;
       }
     }
     else if(segDiff < 0)
     {
-      if(Serv->z_servo_micro_current - (segDiff) > desiredMicro)
+      if(z_servo_micro_current - (segDiff) > desiredMicro)
       {
-        Serv->z_servo_micro_current = desiredMicro;
+        z_servo_micro_current = desiredMicro;
         segDiff = 0;
       }
     }
     //-------------------TEST CODE END--------------------
-    Serial.println(Serv->z_servo_micro_current - (segDiff)); // Debug Code
+    Serial.println(z_servo_micro_current - (segDiff)); // Debug Code
 
-    servoMove(Serv,Serv->z_servo_micro_current - (segDiff));
+    servoMove(z_servo_micro_current - (segDiff));
 
     //ADDED DELAY MATH
     unsigned int dlay = 0;
 
     if(segDiff < 0)
-      dlay = (unsigned int)(((map(segDiff, 0, -SERVO_PULSE_RANGE, 0 , SERVO_MAX_TRAVEL) / 60.0) * Serv->z_servo_speed) + 1);
+      dlay = (unsigned int)(((map(segDiff, 0, -SERVO_PULSE_RANGE, 0 , SERVO_MAX_TRAVEL) / 60.0) * z_servo_speed) + 1);
     else
-      dlay = (unsigned int)(((map(segDiff, 0, SERVO_PULSE_RANGE, 0 , SERVO_MAX_TRAVEL) / 60.0) * Serv->z_servo_speed) + 1);
+      dlay = (unsigned int)(((map(segDiff, 0, SERVO_PULSE_RANGE, 0 , SERVO_MAX_TRAVEL) / 60.0) * z_servo_speed) + 1);
     
     //Serial.println(dlay);
       
@@ -133,15 +133,15 @@ void servoMoveSegmented(ServoType *Serv, unsigned int desiredMicro, unsigned int
 
 }
 
-void servoOpen(ServoType *Serv)
+void ArmServo::servoOpen()
 {
-  digitalWrite(Serv->z_MOSFET_pin,HIGH);
-  servoMoveSegmented(Serv,Serv->z_servo_micro_open,20);
-  digitalWrite(Serv->z_MOSFET_pin,LOW);
+  digitalWrite(z_MOSFET_pin,HIGH);
+  servoMoveSegmented(z_servo_micro_open,20);
+  digitalWrite(z_MOSFET_pin,LOW);
 }
 
-void servoClosed(ServoType *Serv)
+void ArmServo::servoClosed()
 {
-  digitalWrite(Serv->z_MOSFET_pin,HIGH);
-  servoMoveSegmented(Serv,Serv->z_servo_micro_closed,20);
+  digitalWrite(z_MOSFET_pin,HIGH);
+  servoMoveSegmented(z_servo_micro_closed,20);
 }
