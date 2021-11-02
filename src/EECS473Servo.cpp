@@ -1,3 +1,8 @@
+/*
+----------------------------------
+-----Includes-----
+----------------------------------
+*/
 // The following tutorials were used to create this library:
 // https://www.arduino.cc/en/Hacking/LibraryTutorial
 // https://www.arduino.cc/en/guide/libraries
@@ -7,15 +12,15 @@
 
 /*
 ----------------------------------
----Variable Defines-------
+---Defines-------
 ----------------------------------
 */
 #define SERVO_MAX_TRAVEL 150
 #define SERVO_PULSE_RANGE 1400
-#define DEBUG 0
+#define SERVO_DEBUG 0
 /*
 ----------------------------------
----Function Initializations-------
+---Method Initializations-------
 ----------------------------------
 */
 
@@ -96,7 +101,6 @@ void ArmServo::servoMoveSegmented(unsigned int desiredMicro, unsigned int seg)
   /* Moves Servo to desired endpoint using segmented points in between the starting and final micro */
   for(i = 0; i < seg; i++)
   {
-    //-------------------TEST CODE START------------------
     /*Prevents code from writing beyond the desiredMicro value*/
     if(segDiff > 0)
     {
@@ -114,8 +118,7 @@ void ArmServo::servoMoveSegmented(unsigned int desiredMicro, unsigned int seg)
         segDiff = 0;
       }
     }
-    //-------------------TEST CODE END--------------------
-    #if DEBUG
+    #if SERVO_DEBUG
     Serial.println(z_servo_micro_current - (segDiff)); // Debug Code
     #endif
     servoMove(z_servo_micro_current - (segDiff));
@@ -127,7 +130,7 @@ void ArmServo::servoMoveSegmented(unsigned int desiredMicro, unsigned int seg)
       dlay = (unsigned int)(((map(segDiff, 0, -SERVO_PULSE_RANGE, 0 , SERVO_MAX_TRAVEL) / 60.0) * z_servo_speed) + 1);
     else
       dlay = (unsigned int)(((map(segDiff, 0, SERVO_PULSE_RANGE, 0 , SERVO_MAX_TRAVEL) / 60.0) * z_servo_speed) + 1);
-    #if DEBUG
+    #if SERVO_DEBUG
     Serial.println(dlay);
     #endif
     delay(dlay);

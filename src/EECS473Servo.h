@@ -7,11 +7,11 @@
 #include "Arduino.h"
 /*
 ----------------------------------
--------------Type Definitions-----
+-------------Class Definition-----
 ----------------------------------
 */
 
-/*Type definition for a structure regarding servos.*/
+/*Type definition for a Class regarding servos.*/
 class ArmServo
 {
   public:
@@ -29,7 +29,7 @@ class ArmServo
 
     /*
     ----------------------------------
-    -----Function Prototypes-----
+    -----Method Prototypes-----
     ----------------------------------
     */
     /*
