@@ -1,8 +1,8 @@
 // The following tutorials were used to create this library:
 // https://www.arduino.cc/en/Hacking/LibraryTutorial
 // https://www.arduino.cc/en/guide/libraries
-#ifndef Morse_h
-#define Morse_h
+#ifndef EECS473_SERVO_h
+#define EECS473_SERVO_h
 #include "Servo.h"
 #include "Arduino.h"
 /*
@@ -79,4 +79,4 @@ class ArmServo
 
 };
 
-#endif
+#endif // EECS473_SERVO_h
