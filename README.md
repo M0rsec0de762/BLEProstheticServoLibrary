@@ -15,4 +15,4 @@ As mentioned above, first follow each repo's respecive instructions for their pr
 
 # Utilizing the Example Code/Schematic
 The example schematic should be open-able using easyEDA. Otherwise, an image of the schematic will be down below:
-![](example\ExampleSchematic\Schematic_Servo_MOSFET_Circuit_2021-11-03.pdf)
+![](example/EECS473Servo/ExampleSchematic/Schematic_Servo_MOSFET_Circuit_2021-11-03.png)
