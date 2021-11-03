@@ -12,3 +12,7 @@ Follow each repo's respecive instructions for their proper installations.
 
 # Installation Instructions
 As mentioned above, first follow each repo's respecive instructions for their proper installations. Then, download the files within the "src" folder. Lastly, put the files witnin the "src" folder into a .zip file and use the following link to install the library: (https://www.arduino.cc/en/guide/libraries#toc4)
+
+# Utilizing the Example Code/Schematic
+The example schematic should be open-able using easyEDA. Otherwise, an image of the schematic will be down below:
+![](example\ExampleSchematic\Schematic_Servo_MOSFET_Circuit_2021-11-03.pdf)
