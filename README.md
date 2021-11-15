@@ -3,7 +3,7 @@ This repo uses two different libraries to operate two PWM servos, which are conn
 # Libraries Used In the Creation of this Code
 
 Using Arduino's servo.h library on the ESP32
-(https://github.com/RoboticsBrno/ServoESP32)(ver 1.0.3)
+(https://github.com/RoboticsBrno/ServoESP32) (ver 1.0.3)
 
 Using Arduino IDE and arduino.h for programming the ESP32
 (https://github.com/espressif/arduino-esp32) (ver 1.0.6)
