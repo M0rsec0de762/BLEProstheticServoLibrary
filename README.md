@@ -11,7 +11,7 @@ Using Arduino IDE and arduino.h for programming the ESP32
 Follow each repo's respecive instructions for their proper installations.
 
 # Installation Instructions
-As mentioned above, first follow each repo's respecive instructions for their proper installations. Then, download the files within the "src" folder. Lastly, put the files witnin the "src" folder into a .zip file and use the following link to install the library: (https://www.arduino.cc/en/guide/libraries#toc4)
+As mentioned above, first follow each repo's respecive instructions for their proper installations. Then, download the files within the "src" folder. Lastly, put the files witnin the "src" folder into a .zip file and use the following link to install the library: (https://www.arduino.cc/en/guide/libraries#toc4). When using this repo, use the src file from Tag2 for the most up to date code.
 
 # Utilizing the Example Code/Schematic
 The example schematic should be open-able using easyEDA. Otherwise, an image of the schematic is below:
